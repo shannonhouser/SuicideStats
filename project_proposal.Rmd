@@ -19,3 +19,10 @@ library(tidyverse)
 suicide <- read_csv("SuicideData.csv")
 ```
 
+## Introduction 
+
+
+As the Duke community grieves the loss of two of our classmates to suicide in the last 2 weeks, our team plans to analyze general global suicide rates from 1985-2016 in order to see if there are any prevalant factors that might contribute to people taking their own lives. The dataset we have selected compiles data from four distinct datasets that includes information on suicides from over 100 different countries throughout the world. The data compares socio-economic info with suicide rates by country and year. The data is sourced from the World Health Organization, the World Bank and, the United Nations Development Program.  Our goal is to examine these different socio-economic, location, and gender factors to gain insight regarding how the variables of the dataset impact increased suicide rates. Each observation corresponds to the number of suicides that occurred in a certain country and within a certain age and gender group. The variables include country, year, sex, age group, count of suicides, population, suicide rate, country-year composite key, HDI for year, gdp for year, gdp per capita, and generation. 
+
+## Data Analysis Plan
+
