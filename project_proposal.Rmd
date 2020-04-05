@@ -11,9 +11,6 @@ knitr::opts_chunk$set(echo = FALSE, comment = NA,
                       fig.height=6, fig.width = 9, fig.align = "center")
 ```
 
-Please adjust the title to something meaningful. Do not keep it as 
-"Project Proposal".
-
 ```{r data}
 library(tidyverse)
 suicide <- read_csv("SuicideData.csv")
@@ -25,4 +22,45 @@ suicide <- read_csv("SuicideData.csv")
 As the Duke community grieves the loss of two of our classmates to suicide in the last 2 weeks, our team plans to analyze general global suicide rates from 1985-2016 in order to see if there are any prevalant factors that might contribute to people taking their own lives. The dataset we have selected compiles data from four distinct datasets that includes information on suicides from over 100 different countries throughout the world. The data compares socio-economic info with suicide rates by country and year. The data is sourced from the World Health Organization, the World Bank and, the United Nations Development Program.  Our goal is to examine these different socio-economic, location, and gender factors to gain insight regarding how the variables of the dataset impact increased suicide rates. Each observation corresponds to the number of suicides that occurred in a certain country and within a certain age and gender group. The variables include country, year, sex, age group, count of suicides, population, suicide rate, country-year composite key, HDI for year, gdp for year, gdp per capita, and generation. 
 
 ## Data Analysis Plan
+
+# Summary Statistics
+
+```{r}
+top_ten <- suicide %>% 
+  group_by(country) %>% 
+  summarise(total_suicides = sum(suicides_no)) %>% 
+  arrange(desc(total_suicides)) %>%
+  slice(1:10) %>% 
+  select(country) %>% 
+  pull()
+
+suicide %>% 
+  group_by(country) %>% 
+  summarise(total_suicides = sum(suicides_no)) %>% 
+  arrange(desc(total_suicides)) %>% 
+  slice(1:10)
+```
+
+```{r}
+total_suicides_sex <- suicide %>% 
+  group_by(sex) %>% 
+  summarise(suicides_sex = sum(suicides_no))
+
+ggplot(data = total_suicides_sex, mapping = aes(x = sex, y = suicides_sex))+
+  geom_col()+
+  labs(title = "Males are 3.3 times more likely than females to commit suicide",
+       x = "Sex", y = "Count")
+
+```
+
+```{r}
+top_ten_over_time <- suicide %>% 
+  group_by(country, year) %>% 
+  summarise(per_year = sum(suicides_no)) %>% 
+  filter(country %in% c(top_ten))
+
+ggplot(data = top_ten_over_time, aes(x = year, y = per_year, color = country))+
+  geom_line()
+  
+```
 
