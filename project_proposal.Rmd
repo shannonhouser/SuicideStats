@@ -1,7 +1,7 @@
 ---
-title: "Project Proposal"
-subtitle: ""
-author: "Lab Group - Member 1, Member 2, Member 3, Member 4"
+title: "Global Suicide Statistics"
+subtitle: "An in-depth Analysis"
+author: "Team BSJ - Shannon Houser, Jack McNeilly, Brian Linder"
 output: pdf_document
 ---
 
@@ -13,3 +13,9 @@ knitr::opts_chunk$set(echo = FALSE, comment = NA,
 
 Please adjust the title to something meaningful. Do not keep it as 
 "Project Proposal".
+
+```{r data}
+library(tidyverse)
+suicide <- read_csv("SuicideData.csv")
+```
+
