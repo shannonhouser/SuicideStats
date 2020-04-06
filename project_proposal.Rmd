@@ -36,9 +36,9 @@ count of suicides, population, suicide rate, country-year composite key,
 HDI for year, gdp for year, gdp per capita, and generation. 
 
 
-## Data Analysis Plan
+# Data Analysis Plan
 
-# Summary Statistics and Visualizations
+## Summary Statistics and Visualizations
 
 
 ```{r top_ten}
@@ -195,7 +195,7 @@ ggplot(data = top_10_gdp_capita, mapping = aes(x = avg_gdp_capita,
 ```
 
 
-# Planning
+## Planning
 
 The response variables we will test are the numbers of suicides and the
 number of suicides per 100k people. The explanatory variables we will 
@@ -210,3 +210,8 @@ visualization techniques, and null hypothesis testing.
 From our preliminary analysis, we believe that trying to find predictors of suicide using modeling techniques would be a good place to start. We believe that such variables as sex and age may have large impacts on the response variables of total suicide numbers and mean suicide rates. We also believe that gdp and gdp per capita may not play as large of a role as people may think. Instead, perhaps geopolitical factors that are outside of our datasets scope play a large part in suicide determinants. 
 
 Furthermore, it may be further explore how these factors have changed over time and if the changes are statistically significant. For example, we may explore whether the total number of suicides in the US has significantly changed between 1985 and 2016. 
+
+```{r glimpse}
+glimpse(suicide)
+```
+
