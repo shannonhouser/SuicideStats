@@ -103,5 +103,7 @@ examine are different age groups, years, countries, and the socioeconomic
 status of these countries, including their Human Development Index (HDI),
 growth domestic product (GDP), and GDP per capita.
 
-
+In our analysis of the dataset we plan to use statistical methods and tools 
+in R including, linear modeling, regression modeling, a combination of
+visualization techniques, and null hypothesis testing. 
 
