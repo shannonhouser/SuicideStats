@@ -82,9 +82,23 @@ total_suicides_sex <- suicide %>%
 
 ggplot(data = total_suicides_sex, mapping = aes(x = sex, y = suicides_sex))+
   geom_col()+
-  labs(title = "Males are 3.3 times more likely than females to commit suicide",
+  labs(title = 
+         "Males are 3.3 times more likely than females to commit suicide",
        x = "Sex", y = "Count")
 ```
+
+```{r}
+total_suicides_age <- suicide %>% 
+  group_by(age) %>% 
+  summarise(suicides_age = sum(suicides_no))
+
+ggplot(data = total_suicides_age, mapping = aes(x = age, y = suicides_age))+
+  geom_col()+
+  labs(title = 
+         "Males are 3.3 times more likely than females to commit suicide",
+       x = "Age", y = "Count")
+```
+
 
 ```{r}
 top_ten_over_time <- suicide %>% 
@@ -92,9 +106,22 @@ top_ten_over_time <- suicide %>%
   summarise(per_year = sum(suicides_no)) %>% 
   filter(country %in% c(top_ten))
 
-ggplot(data = top_ten_over_time, aes(x = year, y = per_year, color = country))+
+ggplot(data = top_ten_over_time, aes(x = year, y = per_year, 
+                                     color = country))+
   geom_line()+
-  labs(title = "Total Suicides in top 10 countries", x = "Year", y="Total Suicides per Year")
+  labs(title = "Total Suicides in top 10 countries", 
+       x = "Year", y="Total Suicides per Year", color = "Country")
+```
+```{r}
+us_age_time <- suicide %>% 
+  group_by(country, age, year) %>% 
+  filter(country == "United States") %>% 
+  summarise(per_age = sum(suicides_no))
+
+ggplot(data = us_age_time, aes(x = year, y = per_age, color = age))+
+  geom_line()+
+  labs(title = "Increasing number of Suicides in 35-74 year olds over time", 
+       x = "Year", y="Total Suicides per Year", color = "Age")
 ```
 
 The response variables we will test are the numbers of suicides and the
