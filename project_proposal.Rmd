@@ -207,3 +207,6 @@ In our analysis of the dataset we plan to use statistical methods and tools
 in R including, linear modeling, regression modeling, a combination of
 visualization techniques, and null hypothesis testing.
 
+From our preliminary analysis, we believe that trying to find predictors of suicide using modeling techniques would be a good place to start. We believe that such variables as sex and age may have large impacts on the response variables of total suicide numbers and mean suicide rates. We also believe that gdp and gdp per capita may not play as large of a role as people may think. Instead, perhaps geopolitical factors that are outside of our datasets scope play a large part in suicide determinants. 
+
+Furthermore, it may be further explore how these factors have changed over time and if the changes are statistically significant. For example, we may explore whether the total number of suicides in the US has significantly changed between 1985 and 2016. 
