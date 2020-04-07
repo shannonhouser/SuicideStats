@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = FALSE, comment = NA,
 
 ```{r data}
 library(tidyverse)
-suicide <- read_csv("SuicideData.csv")
+suicide <- read_csv("Data/SuicideData.csv")
 ```
 
 ## Introduction 
@@ -271,7 +271,7 @@ whether the total number of suicides in the US has significantly changed between
 1985 and 2016, and compare these changes with comparable nations within the data.
 
 
-# Glimpse
+# Glimpse of Data
 
 ```{r glimpse}
 glimpse(suicide)

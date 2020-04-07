@@ -1,9 +1,12 @@
 **Codebook and Dimmensions**
 
 This dataset looks at the  global suicide rates from 1985-2016 collected from
-over 100 different countries worldwide. The dataset contains 27,280 observations
+over 100 different countries worldwide. The dataset contains 27,820 observations
 from 12 different variables to help analyze what factors, if any, may have 
-influenced a person to take their own life. 
+influenced a person to take their own life. Each observation corresponds to the
+data on suicides in a specific country and year of individuals of a specific 
+age and gender group. For example, one observation may correspond to the females 
+between the ages 15-24 that commited suicide in the United States in 2014. 
 
 The variables in the study are: 
 **country**: The country where the suicide took place
