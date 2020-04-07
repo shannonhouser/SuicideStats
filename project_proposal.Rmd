@@ -88,7 +88,12 @@ suicide %>%
   arrange(desc(rate_suicide)) %>% 
   slice(1:10)
 ```
-When we examined the suicide rate (per 100k people), we found a strong correlation between geopolitical circumstances as 9/10 of the top 10 countries for suicide rate were part of the ex- Soviet Union. They are all Eastern European countries that may share history, religions, wars, etc. that we are unable to currently predict. 
+
+When we examined the suicide rate (per 100k people), we found a strong
+correlation between geopolitical circumstances as 9/10 of the top 10 countries
+for suicide rate were part of the ex- Soviet Union. They are all Eastern 
+European countries that may share history, religions, wars, etc. that we are
+unable to currently predict. 
 
 ```{r top_ten_rate_over_time}
 top_ten_rate_over_time <- suicide %>% 
@@ -105,7 +110,10 @@ ggplot(data = top_ten_rate_over_time, aes(x = year, rate_suicide,
          "Showing 10 countries with highest suicide rates from 1985-2016",
        x = "Year", y="Suicide Rate", color = "Country")
 ```
-Graphing the average suicide rates over time in the ten countries with the highest suicide rates, we can see that the suicide rates peaked in the late 1990's and have continued to decrease since. 
+
+Graphing the average suicide rates over time in the ten countries with the
+highest suicide rates, we can see that the suicide rates peaked in the late
+1990's and have continued to decrease since. 
 
 
 ```{r total_sex}
@@ -122,7 +130,10 @@ ggplot(data = total_suicides_sex, mapping = aes(x = sex, y = suicides_sex,
        x = "Sex", y = "Count")
     
 ```
-From this data visualization, it is obvious that sex is probably a very important variable when predicting suicide. Men are more than 3.3 times more likely than women to commit suicide. 
+
+From this data visualization, it is obvious that sex is probably a very
+important variable when predicting suicide. Men are more than 3.3 times more
+likely than women to commit suicide. 
 
 ```{r total_age}
 total_suicides_age <- suicide %>% 
@@ -141,7 +152,11 @@ ggplot(data = total_suicides_age, mapping = aes(x = age, y = suicides_age,
        x = "Age Group", y = "Count")
 ```
 
-This visualization shows us that age may also have a strong influence on the likeliness of someone to commit suicide. From the last two visualizations, we may suggest the possibility that middle-aged men are most at risk for suicide. We may also want to examine this relationship more and see brainstorm what life factors make middle-aged men more likey than any other group to commit suicide. 
+This visualization shows us that age may also have a strong influence on the
+likeliness of someone to commit suicide. From the last two visualizations, we
+may suggest the possibility that middle-aged men are most at risk for suicide.
+We may also want to examine this relationship more and see brainstorm what life
+factors make middle-aged men more likey than any other group to commit suicide. 
 
 ```{r total_gen}
 suicide %>% 
@@ -149,7 +164,11 @@ suicide %>%
   summarise(tot_gen = sum(suicides_no)) %>% 
   arrange(desc(tot_gen))
 ```
-This shows the total number of suicides per generation. This has a lot to do with age group and thus is redundant; however, it may help us to bettwe understand what kinds of life circumstances outside of the data these people may have faced to lead them to commit suicide. 
+
+This shows the total number of suicides per generation. This has a lot to do
+with age group and thus is redundant; however, it may help us to better
+understand what kinds of life circumstances outside of the data these people 
+may have faced to lead them to commit suicide. 
 
 ```{r age_over_time}
 us_age_time <- suicide %>% 
@@ -162,7 +181,13 @@ ggplot(data = us_age_time, aes(x = year, y = per_age, color = age))+
   labs(title = "Increasing number of Suicides in 35-74 year olds over time", 
        x = "Year", y="Total Suicides per Year", color = "Age")
 ```
-From this visualization we can see that over time, the number of global suicides for those between the ages of 35- 74 have increased the most drastically. The other age groups seem to be roughly stable; however, it does appear that all other age groups are increasing at the very end of the graph. It would be interesting to see if this sad trend continued past the last year of this study's data collection, 2016. 
+
+From this visualization we can see that over time, the number of global 
+suicides for those between the ages of 35- 74 have increased the most
+drastically. The other age groups seem to be roughly stable; however, it does
+appear that all other age groups are increasing at the very end of the graph.
+It would be interesting to see if this sad trend continued past the last 
+year of this study's data collection, 2016. 
 
 ```{r gdp_top_ten}
 suicide %>%
@@ -202,30 +227,54 @@ ggplot(data = top_10_gdp_capita, mapping = aes(x = avg_gdp_capita,
 
 The response variables we will test are the numbers of suicides and the
 number of suicides per 100k people. The explanatory variables we will 
-examine are different age groups, years, sex, countries, and the socioeconomic
-status of these countries, including their Human Development Index (HDI),
-growth domestic product (GDP), and GDP per capita.
+examine are different age groups, sex, years, countries, and the 
+socioeconomic status of each country, including their Human Development
+Index (HDI),growth domestic product (GDP), and GDP per capita.
+
+In addition to observing each individual explanatory variable's 
+impact on the response variables, we will examine how the following 
+combination of explanatory variables and the corresponding result 
+on the response variables: 
+
+-Age groups faceted by sex 
+-HDI with age 
+-HDI with sex 
+-HDI with sex and age
+-GDP with age
+-GDP with sex
+-GDP with sex and age
+-the above combinations faceted by time period (years) 
+-the above combinations for Each individual country
+-the above combinations for World regions including continents and
+sub-regions of each continent
+
+
+In our analysis of the dataset we plan to use statistical methods and tools 
+in R including, linear modeling, regression modeling, a combination of
+visualization techniques, and null hypothesis testing. 
 
 In our analysis of the dataset we plan to use statistical methods and tools 
 in R including, linear modeling, regression modeling, a combination of
 visualization techniques, and null hypothesis testing.
 
-From our preliminary analysis, we believe that trying to find predictors of 
+From our preliminary analysis, we believe that trying to find predictors of
 suicide using modeling techniques would be a good place to start. We believe 
-that such variables as sex and age may have large impacts on the response 
-variables of total suicide numbers and mean suicide rates. We also believe 
-that gdp and gdp per capita may not play as large of a role as people may 
-think. Instead, perhaps geopolitical factors that are outside of our datasets
-scope play a large part in suicide determinants. 
+that such variables as sex and age may have large impacts on the response
+variables of total suicide numbers and mean suicide rates. We also believe
+that gdp and gdp per capita may not play as large of a role as people may think.
+Instead, perhaps geopolitical factors that are outside of our datasets scope
+play a large part in suicide determinants. 
 
-Furthermore, it may be further explored how these factors have changed over 
-time and if the changes are statistically significant. For example, we may 
-explore whether the total number of suicides in the US has significantly 
-changed between 1985 and 2016. 
+Furthermore, we plan to explore how these factors have changed over time
+and if the changes are statistically significant. For example, we will explore
+whether the total number of suicides in the US has significantly changed between
+1985 and 2016, and compare these changes with comparable nations within the data.
+
 
 # Glimpse
 
 ```{r glimpse}
 glimpse(suicide)
 ```
+
 

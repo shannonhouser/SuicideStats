@@ -1,3 +1,5 @@
+**Codebook and Dimmensions**
+
 This dataset looks at the  global suicide rates from 1985-2016 collected from
 over 100 different countries worldwide. The dataset contains 27,280 observations
 from 12 different variables to help analyze what factors, if any, may have 
