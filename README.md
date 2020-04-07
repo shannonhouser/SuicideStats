@@ -3,7 +3,9 @@
 This dataset looks at the  global suicide rates from 1985-2016 collected from
 over 100 different countries worldwide. The dataset contains 27,280 observations
 from 12 different variables to help analyze what factors, if any, may have 
-influenced a person to take their own life. The variables in the study are: 
+influenced a person to take their own life. 
+
+The variables in the study are: 
 country: The country where the suicide took place
 year: the year that the suicide happened
 age: the age range of the person who committed suicide
