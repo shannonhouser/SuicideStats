@@ -99,11 +99,26 @@ ggplot(data = top_ten_over_time, aes(x = year, y = per_year, color = country))+
 
 The response variables we will test are the numbers of suicides and the
 number of suicides per 100k people. The explanatory variables we will 
-examine are different age groups, years, countries, and the socioeconomic
-status of these countries, including their Human Development Index (HDI),
-growth domestic product (GDP), and GDP per capita.
+examine are different age groups, sex, years, countries, and the 
+socioeconomic status of each country, including their Human Development
+Index (HDI),growth domestic product (GDP), and GDP per capita.
+
+In addition to observing each individual explanatory variable's impact on the response variables, we will examine how the following combination of explanatory variables and the corresponding result on the response variables: 
+
+-Age groups faceted by sex 
+-HDI with age 
+-HDI with sex 
+-HDI with sex and age
+-GDP with age
+-GDP with sex
+-GDP with sex and age
+-the above combinations faceted by time period (years) 
+-the above combinations for Each individual country
+-the above combinations for World regions including continents and
+sub-regions of each continent
+
 
 In our analysis of the dataset we plan to use statistical methods and tools 
 in R including, linear modeling, regression modeling, a combination of
-visualization techniques, and null hypothesis testing. 
+visualization techniques, and null hypothesis testing. We will use packages including 
 
