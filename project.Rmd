@@ -11,6 +11,11 @@ knitr::opts_chunk$set(echo = FALSE, comment = NA,
                       fig.height=6, fig.width = 9, fig.align = "center")
 ```
 
+```{r data}
+library(tidyverse)
+suicide <- read_csv("Data/SuicideData.csv")
+```
+
 ## Introduction 
 
 As the Duke community grieves the loss of two of our classmates to suicide 
