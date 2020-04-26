@@ -283,9 +283,50 @@ suicide <- janitor::clean_names(suicide)
 
 
 ```{r lm}
+library(broom)
 lm_total <- lm(suicides_100k_pop ~ factor(sex) + factor(age) + hdi_for_year 
                + gdp_per_capita, data = suicide)
 
+lm_step <- step(lm_total, direction = "backward")
 
+tidy(lm_total)
+
+glance(lm_total) %>% 
+  pull(adj.r.squared)
+```
+
+
+```{r check_linearity}
+augment(lm_total) %>% 
+  ggplot(aes(x = .fitted, y = .resid))+
+  geom_point()+
+  labs(x = "Predicted Suicide Rate per 100k", y = "Residual Value")+
+  geom_hline(yintercept = 0, color = "red", lty = 2)
+
+augment(lm_total) %>% 
+  ggplot(aes(x = .resid))+
+  geom_histogram(bins = 17)+
+  labs(x = "Residual Value", y = "Count")
+
+augment(lm_total) %>% 
+  ggplot(aes(x = 1:8364, y = .resid))+
+  geom_point()+
+  labs(x = "Index", y = "Residual Value")
+```
+
+# Try Hypothesis Test
+
+```{r}
+library(infer)
+suicide %>% 
+  filter(country == "United States",
+         year == 1985,
+         age == "15-24 years") %>% 
+  summarise(avg_1985 = mean(suicides_100k_pop))
+
+suicide %>% 
+  filter(country == "United States",
+         year == 2015,
+         age == "15-24 years")
 ```
 
