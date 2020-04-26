@@ -273,3 +273,19 @@ whether the total number of suicides in the US has significantly changed between
 ```{r glimpse}
 glimpse(suicide)
 ```
+
+# Try at LM 
+
+```{r clean_names}
+library(janitor)
+suicide <- janitor::clean_names(suicide)
+```
+
+
+```{r lm}
+lm_total <- lm(suicides_100k_pop ~ factor(sex) + factor(age) + hdi_for_year 
+               + gdp_per_capita, data = suicide)
+
+
+```
+
