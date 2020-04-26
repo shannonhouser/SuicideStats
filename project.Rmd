@@ -37,6 +37,10 @@ HDI for year, gdp for year, gdp per capita, and generation.
 
 ## Summary Statistics and Visualizations
 
+```{r clean_names}
+library(janitor)
+suicide <- janitor::clean_names(suicide)
+```
 
 ```{r top_ten}
 top_ten <- suicide %>% 
@@ -73,7 +77,7 @@ We decided that this is not really helpful information and went on to explore fu
 ```{r top_ten_rate}
 top_ten_rate <- suicide %>% 
   group_by(country) %>% 
-  summarise(rate_suicide = mean(`suicides/100k pop`))%>% 
+  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
   arrange(desc(rate_suicide)) %>%
   slice(1:10) %>% 
   select(country) %>% 
@@ -81,7 +85,7 @@ top_ten_rate <- suicide %>%
 
 suicide %>% 
   group_by(country) %>% 
-  summarise(rate_suicide = mean(`suicides/100k pop`)) %>% 
+  summarise(rate_suicide = mean(suicides_100k_pop)) %>% 
   arrange(desc(rate_suicide)) %>% 
   slice(1:10)
 ```
@@ -94,8 +98,8 @@ unable to currently predict.
 
 ```{r top_ten_rate_over_time}
 top_ten_rate_over_time <- suicide %>% 
-  group_by(country, year) %>% 
-  summarise(rate_suicide = mean(`suicides/100k pop`)) %>% 
+  group_by(country, year) %>%
+  summarise(rate_suicide = mean(suicides_100k_pop)) %>% 
   filter(country %in% c(top_ten_rate))
 
 ggplot(data = top_ten_rate_over_time, aes(x = year, rate_suicide, 
@@ -189,23 +193,23 @@ year of this study's data collection, 2016.
 ```{r gdp_top_ten}
 suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp = mean(`gdp_for_year ($)`)) %>% 
+  summarise(avg_gdp = mean(gdp_for_year)) %>% 
   arrange(desc(avg_gdp)) 
 
 top_10_gdp <- suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp = mean(`gdp_for_year ($)`),
+  summarise(avg_gdp = mean(gdp_for_year),
             tot_suicides = sum(suicides_no)) %>% 
   arrange(desc(avg_gdp)) 
 
 suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp_capita = mean(`gdp_per_capita ($)`)) %>% 
+  summarise(avg_gdp_capita = mean(gdp_per_capita)) %>% 
   arrange(desc(avg_gdp_capita)) 
 
 top_10_gdp_capita <- suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp_capita = mean(`gdp_per_capita ($)`),
+  summarise(avg_gdp_capita = mean(gdp_per_capita),
             tot_suicides = sum(suicides_no)) %>% 
   arrange(desc(avg_gdp_capita))
 ```
@@ -336,17 +340,11 @@ suicide.
 
 # Try at LM 
 
-```{r clean_names}
-library(janitor)
-suicide <- janitor::clean_names(suicide)
-```
 
 
 ```{r lm}
 lm_total <- lm(suicides_100k_pop ~ factor(sex) + factor(age) + hdi_for_year 
                + gdp_per_capita, data = suicide)
-
-
 ```
 
 
@@ -356,13 +354,13 @@ suicide_hdi <- suicide %>%
 
 suicide_hdi %>% 
   group_by(country) %>% 
-  summarise(avg_hdi = max(`HDI for year`)) %>% 
+  summarise(avg_hdi = mean(hdi_for_year)) %>% 
   arrange(desc(avg_hdi)) 
 
 top_hdi <- suicide_hdi %>%
   group_by(country) %>% 
-  summarise(avg_hdi = max(`HDI for year`),
-            suicide_per_capita = mean(`suicides/100k pop`)) %>% 
+  summarise(avg_hdi = mean(hdi_for_year),
+            suicide_per_capita = mean(suicides_100k_pop)) %>% 
   arrange(desc(avg_hdi)) 
 ```
 
@@ -370,7 +368,7 @@ top_hdi <- suicide_hdi %>%
 ggplot(data = top_hdi, mapping = aes(x = avg_hdi,
                                      y = suicide_per_capita)) +
   geom_point()+
-  labs(title = "Minimal relationship between gdp per capita and suicides", 
+  labs(title = "Minimal relationship between human development index and suicides", 
        x = "Human Development Index", y = "Suicides per 100k")
 ```
 
