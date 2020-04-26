@@ -1,6 +1,6 @@
 ---
 title: "Global Suicide Statistics"
-subtitle: "An anaylsis of critical variables"
+subtitle: "An analysis of critical variables"
 author: "Team BSJ - Shannon Houser, Jack McNeilly, Brian Linder"
 output: pdf_document
 ---
@@ -10,8 +10,6 @@ knitr::opts_chunk$set(echo = FALSE, comment = NA,
                       message = FALSE, warning = FALSE,
                       fig.height=6, fig.width = 9, fig.align = "center")
 ```
-
-Please adjust the title to something meaningful. Do not keep it as "Project".
 
 ## Introduction 
 
@@ -34,6 +32,10 @@ HDI for year, gdp for year, gdp per capita, and generation.
 
 
 # Data Analysis Plan
+
+```{r}
+library(tidyverse)
+```
 
 ## Summary Statistics and Visualizations
 
@@ -153,7 +155,7 @@ This visualization shows us that age may also have a strong influence on the
 likeliness of someone to commit suicide. From the last two visualizations, we
 may suggest the possibility that middle-aged men are most at risk for suicide.
 We may also want to examine this relationship more and see brainstorm what life
-factors make middle-aged men more likey than any other group to commit suicide. 
+factors make middle-aged men more likely than any other group to commit suicide. 
 
 ```{r total_gen}
 suicide %>% 
@@ -314,21 +316,27 @@ augment(lm_total) %>%
   labs(x = "Index", y = "Residual Value")
 ```
 
-We wanted to fit a linear model to decide which factors were the best when predicting suicide rates across the world. We created a linear model and used the step function to see which were the best variables for predicting sucide rates. We determined that sex, age, gdp per capita, and hdi per capita were the best predictors of suicide rate. 
+We wanted to fit a linear model to decide which factors were the best when predicting suicide rates across the world. We created a linear model and used the step function to see which were the best variables for predicting suicide rates. We determined that sex, age, gdp per capita, and hdi per capita were the best predictors of suicide rate. 
 
-# Try Hypothesis Test
+# Create better Graphic
 
 ```{r}
-library(infer)
-suicide %>% 
-  filter(country == "United States",
-         year == 1985,
-         age == "15-24 years") %>% 
-  summarise(avg_1985 = mean(suicides_100k_pop))
+ggplot(data = suicide, mapping = aes(x = age, y = suicides_no, 
+                                                fill = age)) +
+  geom_col() +
+  scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
+                            "35-54 years","55-74 years","75+ years")) +
+  scale_fill_manual(values = c("grey 50","grey 50","red", "grey 50",
+                               "grey 50","grey 50"))+
+  coord_flip() +
+  facet_wrap(sex ~ .) +
+  theme(legend.position = "none") +
+  labs(title = 
+  "Males Age 35-54 are Most at Risk for Suicide and 3.3 times more likely 
+than Females to Commit Suicide at any Age",
+       x = "Age Group", y = "Count") 
 
-suicide %>% 
-  filter(country == "United States",
-         year == 2015,
-         age == "15-24 years")
 ```
+
+
 
