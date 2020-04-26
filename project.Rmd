@@ -349,3 +349,28 @@ lm_total <- lm(suicides_100k_pop ~ factor(sex) + factor(age) + hdi_for_year
 
 ```
 
+
+```{r hdi_analysis}
+suicide_hdi <- suicide %>%
+  na.omit(suicide)
+
+suicide_hdi %>% 
+  group_by(country) %>% 
+  summarise(avg_hdi = max(`HDI for year`)) %>% 
+  arrange(desc(avg_hdi)) 
+
+top_hdi <- suicide_hdi %>%
+  group_by(country) %>% 
+  summarise(avg_hdi = max(`HDI for year`),
+            suicide_per_capita = mean(`suicides/100k pop`)) %>% 
+  arrange(desc(avg_hdi)) 
+```
+
+```{r hdi_vs_suicide_per_100k}
+ggplot(data = top_hdi, mapping = aes(x = avg_hdi,
+                                     y = suicide_per_capita)) +
+  geom_point()+
+  labs(title = "Minimal relationship between gdp per capita and suicides", 
+       x = "Human Development Index", y = "Suicides per 100k")
+```
+
