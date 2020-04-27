@@ -372,3 +372,37 @@ ggplot(data = top_hdi, mapping = aes(x = avg_hdi,
        x = "Human Development Index", y = "Suicides per 100k")
 ```
 
+```{r}
+top_hdi <- top_hdi %>% 
+  mutate(hdi_groups = case_when(avg_hdi >= 0.350 & avg_hdi < 0.550 ~ "low
+                                (0.350-0.550)", 
+                                avg_hdi >= 0.550 & avg_hdi < 0.700 ~ "medium (0.550-0.700)", 
+                                avg_hdi >= 0.700 & avg_hdi < 0.800 ~ "high (0.700-0.800)", 
+                                avg_hdi >= 0.800 & avg_hdi < 1 ~ "very high (0.800-1)"))
+```
+
+```{r total_age}
+
+ggplot(data = top_hdi, mapping = aes(x = hdi_groups, y = suicide_per_capita, fill = hdi_groups))+
+  geom_col()+
+  scale_fill_manual(values = c("grey 50","grey 50","red",
+                               "grey 50", "grey 50"))+
+  labs(title = 
+         "Countries with highest HDI experience higher rate of suicide",
+       x = "HDI", y = "Average Suicide per 100k")
+```
+
+The visualization above examines a relationship between the Human Development Index (HDI) 
+and suicides per 100k. HDI examines a combination of facters regarding development, which
+include life expectancy, education level, and gross national income.  We grouped countries
+into four levels according to their assigned HDI value. The categories were as follows: 
+-low = 0.350 - 0.550
+-medium = 0.550-0.700
+-high = 0.700-0.800
+-very high = 0.800-1
+The visualization reveals that, as a group, countries in the "very high" category experience
+the highest number of suicides per 100k. This is follwed by a comparably high number of
+sucides per 100k in the "high" category and a much lower suicide rate for countries in the
+"medium" category. This is an insighful finding allowing us to understand that the more
+developed nations on avaerage suffer from higher rates of suicide, even if their life
+expectancy (a componet of HDI) is greater. 
