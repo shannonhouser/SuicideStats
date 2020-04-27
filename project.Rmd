@@ -334,7 +334,7 @@ suicide_hdi <- suicide %>%
 
 ```{r}
 lm_log <- lm(log(suicides_100k_pop) ~ factor(sex) + factor(age) + year
-           + hdi_for_year + gdp_per_capita, data = suicide_hdi)
+           + hdi_for_year + log(gdp_per_capita), data = suicide_hdi)
 
 lm_step <- step(lm_log, direction = "backward")
 
@@ -342,24 +342,24 @@ tidy(lm_log)
 
 glance(lm_log)
 ```
-$$\widehat{log(suicides/100k)} = sex + age group + year + hdi + gdp/capita$$
+$$\widehat{log(suicides/100k)} = sex + age group + year + hdi + log(gdp/capita)$$
 
 
 ```{r check_linearity}
 augment(lm_log) %>% 
-  ggplot(aes(x = .fitted, y = .resid))+
-  geom_point()+
-  labs(x = "Predicted Suicide Rate per 100k", y = "Residual Value")+
+  ggplot(aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  labs(x = "Predicted Suicide Rate per 100k", y = "Residual Value") +
   geom_hline(yintercept = 0, color = "red", lty = 2)
 
 augment(lm_log) %>% 
-  ggplot(aes(x = .resid))+
-  geom_histogram(bins = 17)+
+  ggplot(aes(x = .resid)) +
+  geom_histogram(bins = 17) +
   labs(x = "Residual Value", y = "Count")
 
 augment(lm_log) %>% 
-  ggplot(aes(x = 1:7207, y = .resid))+
-  geom_point()+
+  ggplot(aes(x = 1:7207, y = .resid)) +
+  geom_point() +
   labs(x = "Index", y = "Residual Value")
 ```
 
@@ -383,6 +383,66 @@ than Females to Commit Suicide at any Age",
 
 ```
 
+```{r}
+library(tidyverse)
+library(rvest)
+library(magrittr)
+library(ggmap)
+library(stringr)
+library(maps)
+```
+
+```{r}
+top_ten_rate <- suicide %>% 
+  group_by(country) %>% 
+  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
+  arrange(desc(rate_suicide)) %>%
+  mutate(country = if_else(country == "Russian Federation", "Russia",
+                           country)) %>% 
+  slice(1:10) 
+
+map_world <- map_data("world")
+
+map_world_joined <- left_join(map_world, top_ten_rate, by = 
+                                c('region' = 'country'))
+
+map_world_joined <- map_world_joined %>% 
+  mutate(fill_flg = ifelse(is.na(rate_suicide),F,T))
+
+ggplot() +
+  geom_polygon(data = map_world_joined, aes(x = long, y = lat, 
+                              group = group, fill = fill_flg)) +
+  scale_fill_manual(values = c("#CCCCCC","#e60000")) +
+  labs(title = 
+         "Countries with Highest Average Suicide Rate are Mostly ex-Soviet Union") +
+  theme(text = element_text(color = "#FFFFFF")
+        ,panel.background = element_rect(fill = "#212121")
+        ,panel.border = element_blank()
+        ,plot.background = element_rect(fill = "#212121")
+        ,panel.grid = element_blank()
+        ,plot.title = element_text(size = 19)
+        ,plot.subtitle = element_text(size = 10)
+        ,axis.text = element_blank()
+        ,axis.title = element_blank()
+        ,axis.ticks = element_blank()
+        ,legend.position = "none"
+        )
+```
+
+```{r}
+gdp_graph_data <- suicide_hdi %>% 
+  group_by(country, gdp_per_capita, hdi_for_year) %>% 
+  summarise(avg_suicide_rate = mean(suicides_100k_pop))
+```
+
+
+```{r}
+ggplot(data = gdp_graph_data, mapping = aes(x = log(gdp_per_capita),
+                                     y = log(avg_suicide_rate))) +
+  geom_point()+
+  geom_smooth()
+```
+
 
 # References
 
@@ -391,4 +451,8 @@ https://ggplot2.tidyverse.org/reference/coord_flip.html
 
 Converting to date 
 https://stackoverflow.com/questions/30255833/convert-four-digit-year-values-to-a-date-type
+
+Map
+https://www.r-bloggers.com/how-to-make-a-global-map-in-r-step-by-step/
+
 
