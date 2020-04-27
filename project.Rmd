@@ -38,11 +38,16 @@ HDI for year, gdp for year, gdp per capita, and generation.
 
 # Data Analysis Plan
 
-```{r}
-library(tidyverse)
-```
-
 ## Summary Statistics and Visualizations
+
+```{r load_packages}
+library(tidyverse)
+library(rvest)
+library(magrittr)
+library(ggmap)
+library(stringr)
+library(maps)
+```
 
 
 ```{r top_ten}
@@ -226,6 +231,80 @@ ggplot(data = top_10_gdp_capita, mapping = aes(x = avg_gdp_capita,
        x = "GDP per capita", y = "Number of Suicides")
 ```
 
+## Try log Graphs
+
+```{r gdp_data}
+gdp_graph_data <- suicide_hdi %>% 
+  group_by(country, gdp_per_capita, hdi_for_year) %>% 
+  summarise(avg_suicide_rate = mean(suicides_100k_pop))
+```
+
+
+```{r gdp_graph_log}
+ggplot(data = gdp_graph_data, mapping = aes(x = log(gdp_per_capita),
+                                     y = log(avg_suicide_rate))) +
+  geom_point()+
+  geom_smooth()
+```
+
+## Create better Graphic
+
+```{r sex_and_age}
+suicide %>% 
+  mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
+  ggplot(mapping = aes(x = age, y = suicides_no, 
+                                                fill = sex)) +
+  geom_col(position = "dodge") +
+  scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
+                            "35-54 years","55-74 years","75+ years")) +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(title = 
+  "Males Age 35-54 Commit Suicide the Most and Males are 3.3 times more likely
+than Females to Commit Suicide at any Age",
+       x = "Age Group", y = "Suicide Count", fill = "Sex") 
+
+```
+
+## Map
+
+```{r world_map}
+top_ten_rate <- suicide %>% 
+  group_by(country) %>% 
+  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
+  arrange(desc(rate_suicide)) %>%
+  mutate(country = if_else(country == "Russian Federation", "Russia",
+                           country)) %>% 
+  slice(1:10) 
+
+map_world <- map_data("world")
+
+map_world_joined <- left_join(map_world, top_ten_rate, by = 
+                                c('region' = 'country'))
+
+map_world_joined <- map_world_joined %>% 
+  mutate(fill_flg = ifelse(is.na(rate_suicide),F,T))
+
+ggplot() +
+  geom_polygon(data = map_world_joined, aes(x = long, y = lat, 
+                              group = group, fill = fill_flg)) +
+  scale_fill_manual(values = c("#CCCCCC","#e60000")) +
+  labs(title = 
+         "Countries with Highest Average Suicide Rate are Mostly ex-Soviet Union") +
+  theme(text = element_text(color = "#FFFFFF")
+        ,panel.background = element_rect(fill = "#212121")
+        ,panel.border = element_blank()
+        ,plot.background = element_rect(fill = "#212121")
+        ,panel.grid = element_blank()
+        ,plot.title = element_text(size = 19)
+        ,plot.subtitle = element_text(size = 10)
+        ,axis.text = element_blank()
+        ,axis.title = element_blank()
+        ,axis.ticks = element_blank()
+        ,legend.position = "none"
+        )
+```
 
 # Planning
 
@@ -387,89 +466,11 @@ completely independent of one another; however, this was not unexpected as the
 data is time series and therefore the suicide rates are not completely 
 independent. 
 
-## Create better Graphic
 
-```{r sex_and_age}
-suicide %>% 
-  mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
-  ggplot(mapping = aes(x = age, y = suicides_no, 
-                                                fill = sex)) +
-  geom_col(position = "dodge") +
-  scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
-                            "35-54 years","55-74 years","75+ years")) +
-  coord_flip() +
-  theme_minimal() +
-  theme(legend.position = "bottom") +
-  labs(title = 
-  "Males Age 35-54 Commit Suicide the Most and Males are 3.3 times more likely
-than Females to Commit Suicide at any Age",
-       x = "Age Group", y = "Suicide Count", fill = "Sex") 
-
-```
-
-```{r load_packages}
-library(tidyverse)
-library(rvest)
-library(magrittr)
-library(ggmap)
-library(stringr)
-library(maps)
-```
-
-## Map
-
-```{r world_map}
-top_ten_rate <- suicide %>% 
-  group_by(country) %>% 
-  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
-  arrange(desc(rate_suicide)) %>%
-  mutate(country = if_else(country == "Russian Federation", "Russia",
-                           country)) %>% 
-  slice(1:10) 
-
-map_world <- map_data("world")
-
-map_world_joined <- left_join(map_world, top_ten_rate, by = 
-                                c('region' = 'country'))
-
-map_world_joined <- map_world_joined %>% 
-  mutate(fill_flg = ifelse(is.na(rate_suicide),F,T))
-
-ggplot() +
-  geom_polygon(data = map_world_joined, aes(x = long, y = lat, 
-                              group = group, fill = fill_flg)) +
-  scale_fill_manual(values = c("#CCCCCC","#e60000")) +
-  labs(title = 
-         "Countries with Highest Average Suicide Rate are Mostly ex-Soviet Union") +
-  theme(text = element_text(color = "#FFFFFF")
-        ,panel.background = element_rect(fill = "#212121")
-        ,panel.border = element_blank()
-        ,plot.background = element_rect(fill = "#212121")
-        ,panel.grid = element_blank()
-        ,plot.title = element_text(size = 19)
-        ,plot.subtitle = element_text(size = 10)
-        ,axis.text = element_blank()
-        ,axis.title = element_blank()
-        ,axis.ticks = element_blank()
-        ,legend.position = "none"
-        )
-```
-
-## Try log Graphs
-
-```{r gdp_data}
-gdp_graph_data <- suicide_hdi %>% 
-  group_by(country, gdp_per_capita, hdi_for_year) %>% 
-  summarise(avg_suicide_rate = mean(suicides_100k_pop))
-```
+# Methods and Results
 
 
-```{r gdp_graph_log}
-ggplot(data = gdp_graph_data, mapping = aes(x = log(gdp_per_capita),
-                                     y = log(avg_suicide_rate))) +
-  geom_point()+
-  geom_smooth()
-```
+
 
 
 # References
