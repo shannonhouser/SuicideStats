@@ -16,7 +16,7 @@ library(tidyverse)
 suicide <- read_csv("Data/SuicideData.csv")
 ```
 
-## Introduction 
+# Introduction 
 
 As the Duke community grieves the loss of two of our classmates to suicide 
 in the last 2 weeks, our team plans to analyze general global suicide 
@@ -227,7 +227,7 @@ ggplot(data = top_10_gdp_capita, mapping = aes(x = avg_gdp_capita,
 ```
 
 
-## Planning
+# Planning
 
 The response variables we will test are the numbers of suicides and the
 number of suicides per 100k people. The explanatory variables we will 
@@ -281,7 +281,7 @@ whether the total number of suicides in the US has significantly changed between
 glimpse(suicide)
 ```
 
-# Try at LM 
+## Try at LM 
 
 ```{r clean_names}
 library(janitor)
@@ -321,10 +321,15 @@ augment(lm_total) %>%
   labs(x = "Index", y = "Residual Value")
 ```
 
-We wanted to fit a linear model to decide which factors were the best when predicting suicide rates across the world. We created a linear model and used the step function to see which were the best variables for predicting suicide rates. We determined that sex, age, gdp per capita, and hdi per capita were the best predictors of suicide rate. 
+We wanted to fit a linear model to decide which factors were the best when 
+predicting suicide rates across the world. We created a linear model and used 
+the step function to see which were the best variables for predicting suicide 
+rates. However, our first attempt at a linear model was unsuccessful. We saw 
+that the data was largely skewed to the right and thought it best to do a data
+transformation and predict the log of the suicide rate instead. 
 
-# Log Linear Model
-```{r}
+## Log Linear Model
+```{r filter_for_model}
 library(lubridate)
 suicide_hdi <- suicide %>% 
   filter(suicides_100k_pop != 0) %>% 
@@ -332,7 +337,7 @@ suicide_hdi <- suicide %>%
 ```
 
 
-```{r}
+```{r log_model}
 lm_log <- lm(log(suicides_100k_pop) ~ factor(sex) + factor(age) + year
            + hdi_for_year + log(gdp_per_capita), data = suicide_hdi)
 
@@ -343,13 +348,25 @@ tidy(lm_log)
 glance(lm_log)
 ```
 $$\widehat{log(suicides/100k)} = sex + age group + year + hdi + log(gdp/capita)$$
+This model is a much better predictor. The adjusted R^2 value is .6396, which 
+means that the model accurately predicts about 64% of the variation in the log
+suicide rate globally. Note that this model was created by data that had to 
+filter out the 0s in order to create a better log model. In this way, 
+countries with suicide rates of 0 in a particular year are not able to be 
+accurately predicted using this model. We can interpret all of the 
+coefficients in the model. For example, men will have a log suicide rate that 
+is 1.17 higher than their female counterparts, on average. The model also 
+suggests, that on average the log rate of suicides has decreases slightly over
+time because the coefficient of the year is negative. The model as is, is 
+based on females age 15-24, however, we can use the coefficients given to 
+change the model to predict the suicide rate of indivisuals with very 
+different characteristics. 
 
-
-```{r check_linearity}
+```{r check_linearity_2}
 augment(lm_log) %>% 
   ggplot(aes(x = .fitted, y = .resid)) +
   geom_point() +
-  labs(x = "Predicted Suicide Rate per 100k", y = "Residual Value") +
+  labs(x = "Predicted log Suicide Rate per 100k", y = "Residual Value") +
   geom_hline(yintercept = 0, color = "red", lty = 2)
 
 augment(lm_log) %>% 
@@ -363,9 +380,16 @@ augment(lm_log) %>%
   labs(x = "Index", y = "Residual Value")
 ```
 
-# Create better Graphic
+When checking linearity with the log model, it is obvious that the residuals 
+are not evenly spread out around 0 at every portion of the line. The residuals
+do make an approximately normal distribution. The residuals also do not look 
+completely independent of one another; however, this was not unexpected as the
+data is time series and therefore the suicide rates are not completely 
+independent. 
 
-```{r}
+## Create better Graphic
+
+```{r sex_and_age}
 suicide %>% 
   mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
   ggplot(mapping = aes(x = age, y = suicides_no, 
@@ -383,7 +407,7 @@ than Females to Commit Suicide at any Age",
 
 ```
 
-```{r}
+```{r load_packages}
 library(tidyverse)
 library(rvest)
 library(magrittr)
@@ -392,7 +416,9 @@ library(stringr)
 library(maps)
 ```
 
-```{r}
+## Map
+
+```{r world_map}
 top_ten_rate <- suicide %>% 
   group_by(country) %>% 
   summarise(rate_suicide = mean(suicides_100k_pop))%>% 
@@ -429,14 +455,16 @@ ggplot() +
         )
 ```
 
-```{r}
+## Try log Graphs
+
+```{r gdp_data}
 gdp_graph_data <- suicide_hdi %>% 
   group_by(country, gdp_per_capita, hdi_for_year) %>% 
   summarise(avg_suicide_rate = mean(suicides_100k_pop))
 ```
 
 
-```{r}
+```{r gdp_graph_log}
 ggplot(data = gdp_graph_data, mapping = aes(x = log(gdp_per_capita),
                                      y = log(avg_suicide_rate))) +
   geom_point()+
