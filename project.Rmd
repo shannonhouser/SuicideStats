@@ -1,6 +1,6 @@
 ---
-title: "Project"
-subtitle: ""
+title: "Global Suicide Statistics"
+subtitle: "An analysis of critical variables"
 author: "Team BSJ - Shannon Houser, Jack McNeilly, Brian Linder"
 output: pdf_document
 ---
@@ -11,7 +11,10 @@ knitr::opts_chunk$set(echo = FALSE, comment = NA,
                       fig.height=6, fig.width = 9, fig.align = "center")
 ```
 
-Please adjust the title to something meaningful. Do not keep it as "Project".
+```{r data}
+library(tidyverse)
+suicide <- read_csv("Data/SuicideData.csv")
+```
 
 ## Introduction 
 
@@ -35,12 +38,12 @@ HDI for year, gdp for year, gdp per capita, and generation.
 
 # Data Analysis Plan
 
+```{r}
+library(tidyverse)
+```
+
 ## Summary Statistics and Visualizations
 
-```{r clean_names}
-library(janitor)
-suicide <- janitor::clean_names(suicide)
-```
 
 ```{r top_ten}
 top_ten <- suicide %>% 
@@ -77,7 +80,7 @@ We decided that this is not really helpful information and went on to explore fu
 ```{r top_ten_rate}
 top_ten_rate <- suicide %>% 
   group_by(country) %>% 
-  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
+  summarise(rate_suicide = mean(`suicides/100k pop`))%>% 
   arrange(desc(rate_suicide)) %>%
   slice(1:10) %>% 
   select(country) %>% 
@@ -85,7 +88,7 @@ top_ten_rate <- suicide %>%
 
 suicide %>% 
   group_by(country) %>% 
-  summarise(rate_suicide = mean(suicides_100k_pop)) %>% 
+  summarise(rate_suicide = mean(`suicides/100k pop`)) %>% 
   arrange(desc(rate_suicide)) %>% 
   slice(1:10)
 ```
@@ -98,8 +101,8 @@ unable to currently predict.
 
 ```{r top_ten_rate_over_time}
 top_ten_rate_over_time <- suicide %>% 
-  group_by(country, year) %>%
-  summarise(rate_suicide = mean(suicides_100k_pop)) %>% 
+  group_by(country, year) %>% 
+  summarise(rate_suicide = mean(`suicides/100k pop`)) %>% 
   filter(country %in% c(top_ten_rate))
 
 ggplot(data = top_ten_rate_over_time, aes(x = year, rate_suicide, 
@@ -157,7 +160,7 @@ This visualization shows us that age may also have a strong influence on the
 likeliness of someone to commit suicide. From the last two visualizations, we
 may suggest the possibility that middle-aged men are most at risk for suicide.
 We may also want to examine this relationship more and see brainstorm what life
-factors make middle-aged men more likey than any other group to commit suicide. 
+factors make middle-aged men more likely than any other group to commit suicide. 
 
 ```{r total_gen}
 suicide %>% 
@@ -193,23 +196,23 @@ year of this study's data collection, 2016.
 ```{r gdp_top_ten}
 suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp = mean(gdp_for_year)) %>% 
+  summarise(avg_gdp = mean(`gdp_for_year ($)`)) %>% 
   arrange(desc(avg_gdp)) 
 
 top_10_gdp <- suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp = mean(gdp_for_year),
+  summarise(avg_gdp = mean(`gdp_for_year ($)`),
             tot_suicides = sum(suicides_no)) %>% 
   arrange(desc(avg_gdp)) 
 
 suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp_capita = mean(gdp_per_capita)) %>% 
+  summarise(avg_gdp_capita = mean(`gdp_per_capita ($)`)) %>% 
   arrange(desc(avg_gdp_capita)) 
 
 top_10_gdp_capita <- suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp_capita = mean(gdp_per_capita),
+  summarise(avg_gdp_capita = mean(`gdp_per_capita ($)`),
             tot_suicides = sum(suicides_no)) %>% 
   arrange(desc(avg_gdp_capita))
 ```
@@ -278,100 +281,169 @@ whether the total number of suicides in the US has significantly changed between
 glimpse(suicide)
 ```
 
-## Methods and Results
-
-Throughout our analyzation of global suicide rates, we have been trying to determine which
-factors have the greatest influence on suicides. Our first visualization analyzes this 
-question by examining suicide rates among an equal distribution of males and females 
-to determine which sex has a higher rate of suicides.
-
-```{r total_sex}
-total_suicides_sex <- suicide %>% 
-  group_by(sex) %>% 
-  summarise(suicides_sex = sum(suicides_no))
-
-ggplot(data = total_suicides_sex, mapping = aes(x = sex, y = suicides_sex, 
-                                                fill = sex))+
-  geom_col()+
-  scale_fill_manual(values = c("grey 50", "red"))+
-  labs(title = 
-         "Males are 3.3 times more likely than females to commit suicide",
-       x = "Sex", y = "Count")
-```
-
-In the visualization above, we can see that males have a disproportionately higher rate 
-of suicides versus females. This is particularly interesting today, as often times males
-are encouraged in society to supress feelings of depression and self-doubt, but as 
-we can see, males are 3.3 times more likely to have committed suicides than females in 
-this data set. This is important to consider in the discussion about suicides moving 
-forward, as both males and females are susceptible to thoughts of depression, and males
-have been shown to take their own lives more often than females while experiencing 
-these thoughts.
-
-
-The next visualization we wanted to examine was the effect of age on suicide rates in this
-global dataset. We attempted to look at which age bracket experienced the highest number
-of suicides among the population. 
-
-```{r total_age}
-total_suicides_age <- suicide %>% 
-  group_by(age) %>% 
-  summarise(suicides_age = sum(suicides_no))
-
-ggplot(data = total_suicides_age, mapping = aes(x = age, y = suicides_age, 
-                                                fill = age))+
-  geom_col()+
-  scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
-                            "35-54 years","55-74 years","75+ years"))+
-  scale_fill_manual(values = c("grey 50","grey 50","red", "grey 50",
-                               "grey 50","grey 50"))+
-  labs(title = 
-         "Those Age 35-54 are most at risk for suicide",
-       x = "Age Group", y = "Count")
-```
-What we found when analyzing the global suicide rates amongst age groups was that the 
-highest proportion of suicides were committed by people within the ages of 35-54 years
-old. This is striking, as this population makes up the primary population where people
-may be experiencing a mid-life crisis, or the pressures of working and raising a family.
-It is surprising to see that such a high proportion of suicides occurs in this 
-age bracket, and brings light to the fact that a person of any age can fall victim to 
-suicide.
-
-
 # Try at LM 
 
+```{r clean_names}
+library(janitor)
+suicide <- janitor::clean_names(suicide)
+```
 
 
 ```{r lm}
+library(broom)
 lm_total <- lm(suicides_100k_pop ~ factor(sex) + factor(age) + hdi_for_year 
                + gdp_per_capita, data = suicide)
+
+lm_step <- step(lm_total, direction = "backward")
+
+tidy(lm_total)
+
+glance(lm_total) %>% 
+  pull(adj.r.squared)
 ```
 
 
-```{r hdi_analysis}
-suicide_hdi <- suicide %>%
-  na.omit(suicide)
-
-suicide_hdi %>% 
-  group_by(country) %>% 
-  summarise(avg_hdi = mean(hdi_for_year)) %>% 
-  arrange(desc(avg_hdi)) 
-
-top_hdi <- suicide_hdi %>%
-  group_by(country) %>% 
-  summarise(avg_hdi = mean(hdi_for_year),
-            suicide_per_capita = mean(suicides_100k_pop)) %>% 
-  arrange(desc(avg_hdi)) 
-```
-
-```{r hdi_vs_suicide_per_100k}
-ggplot(data = top_hdi, mapping = aes(x = avg_hdi,
-                                     y = suicide_per_capita)) +
+```{r check_linearity}
+augment(lm_total) %>% 
+  ggplot(aes(x = .fitted, y = .resid))+
   geom_point()+
-  labs(title = "Minimal relationship between human development index and suicides", 
-       x = "Human Development Index", y = "Suicides per 100k")
+  labs(x = "Predicted Suicide Rate per 100k", y = "Residual Value")+
+  geom_hline(yintercept = 0, color = "red", lty = 2)
+
+augment(lm_total) %>% 
+  ggplot(aes(x = .resid))+
+  geom_histogram(bins = 17)+
+  labs(x = "Residual Value", y = "Count")
+
+augment(lm_total) %>% 
+  ggplot(aes(x = 1:8364, y = .resid))+
+  geom_point()+
+  labs(x = "Index", y = "Residual Value")
 ```
 
+We wanted to fit a linear model to decide which factors were the best when predicting suicide rates across the world. We created a linear model and used the step function to see which were the best variables for predicting suicide rates. We determined that sex, age, gdp per capita, and hdi per capita were the best predictors of suicide rate. 
+
+# Log Linear Model
+```{r}
+library(lubridate)
+suicide_hdi <- suicide %>% 
+  filter(suicides_100k_pop != 0) %>% 
+  mutate(year = ymd(year, truncated = 2L))
+```
+
+
+```{r}
+lm_log <- lm(log(suicides_100k_pop) ~ factor(sex) + factor(age) + year
+           + hdi_for_year + log(gdp_per_capita), data = suicide_hdi)
+
+lm_step <- step(lm_log, direction = "backward")
+
+tidy(lm_log)
+
+glance(lm_log)
+```
+$$\widehat{log(suicides/100k)} = sex + age group + year + hdi + log(gdp/capita)$$
+
+
+```{r check_linearity}
+augment(lm_log) %>% 
+  ggplot(aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  labs(x = "Predicted Suicide Rate per 100k", y = "Residual Value") +
+  geom_hline(yintercept = 0, color = "red", lty = 2)
+
+augment(lm_log) %>% 
+  ggplot(aes(x = .resid)) +
+  geom_histogram(bins = 17) +
+  labs(x = "Residual Value", y = "Count")
+
+augment(lm_log) %>% 
+  ggplot(aes(x = 1:7207, y = .resid)) +
+  geom_point() +
+  labs(x = "Index", y = "Residual Value")
+```
+
+# Create better Graphic
+
+```{r}
+suicide %>% 
+  mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
+  ggplot(mapping = aes(x = age, y = suicides_no, 
+                                                fill = sex)) +
+  geom_col(position = "dodge") +
+  scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
+                            "35-54 years","55-74 years","75+ years")) +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(title = 
+  "Males Age 35-54 Commit Suicide the Most and Males are 3.3 times more likely
+than Females to Commit Suicide at any Age",
+       x = "Age Group", y = "Suicide Count", fill = "Sex") 
+
+```
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(magrittr)
+library(ggmap)
+library(stringr)
+library(maps)
+```
+
+```{r}
+top_ten_rate <- suicide %>% 
+  group_by(country) %>% 
+  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
+  arrange(desc(rate_suicide)) %>%
+  mutate(country = if_else(country == "Russian Federation", "Russia",
+                           country)) %>% 
+  slice(1:10) 
+
+map_world <- map_data("world")
+
+map_world_joined <- left_join(map_world, top_ten_rate, by = 
+                                c('region' = 'country'))
+
+map_world_joined <- map_world_joined %>% 
+  mutate(fill_flg = ifelse(is.na(rate_suicide),F,T))
+
+ggplot() +
+  geom_polygon(data = map_world_joined, aes(x = long, y = lat, 
+                              group = group, fill = fill_flg)) +
+  scale_fill_manual(values = c("#CCCCCC","#e60000")) +
+  labs(title = 
+         "Countries with Highest Average Suicide Rate are Mostly ex-Soviet Union") +
+  theme(text = element_text(color = "#FFFFFF")
+        ,panel.background = element_rect(fill = "#212121")
+        ,panel.border = element_blank()
+        ,plot.background = element_rect(fill = "#212121")
+        ,panel.grid = element_blank()
+        ,plot.title = element_text(size = 19)
+        ,plot.subtitle = element_text(size = 10)
+        ,axis.text = element_blank()
+        ,axis.title = element_blank()
+        ,axis.ticks = element_blank()
+        ,legend.position = "none"
+        )
+```
+
+```{r}
+gdp_graph_data <- suicide_hdi %>% 
+  group_by(country, gdp_per_capita, hdi_for_year) %>% 
+  summarise(avg_suicide_rate = mean(suicides_100k_pop))
+```
+
+
+```{r}
+ggplot(data = gdp_graph_data, mapping = aes(x = log(gdp_per_capita),
+                                     y = log(avg_suicide_rate))) +
+  geom_point()+
+  geom_smooth()
+```
+
+<<<<<<< HEAD
 ```{r}
 top_hdi <- top_hdi %>% 
   mutate(hdi_groups = case_when(avg_hdi >= 0.350 & avg_hdi < 0.550 ~ "low
@@ -406,3 +478,18 @@ sucides per 100k in the "high" category and a much lower suicide rate for countr
 "medium" category. This is an insighful finding allowing us to understand that the more
 developed nations on avaerage suffer from higher rates of suicide, even if their life
 expectancy (a componet of HDI) is greater. 
+=======
+
+# References
+
+Coor_flip()
+https://ggplot2.tidyverse.org/reference/coord_flip.html
+
+Converting to date 
+https://stackoverflow.com/questions/30255833/convert-four-digit-year-values-to-a-date-type
+
+Map
+https://www.r-bloggers.com/how-to-make-a-global-map-in-r-step-by-step/
+
+
+>>>>>>> 8835088bf4e1266992ca1c3de570a436fb30a5a2
