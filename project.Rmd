@@ -318,25 +318,72 @@ augment(lm_total) %>%
 
 We wanted to fit a linear model to decide which factors were the best when predicting suicide rates across the world. We created a linear model and used the step function to see which were the best variables for predicting suicide rates. We determined that sex, age, gdp per capita, and hdi per capita were the best predictors of suicide rate. 
 
+# Log Linear Model
+```{r}
+library(lubridate)
+suicide_hdi <- suicide %>% 
+  filter(suicides_100k_pop != 0) %>% 
+  mutate(year = ymd(year, truncated = 2L))
+```
+
+
+```{r}
+lm_log <- lm(log(suicides_100k_pop) ~ factor(sex) + factor(age) + year
+           + hdi_for_year + gdp_per_capita, data = suicide_hdi)
+
+lm_step <- step(lm_log, direction = "backward")
+
+tidy(lm_log)
+
+glance(lm_log)
+```
+$$\widehat{log(suicides/100k)} = sex + age group + year + hdi + gdp/capita$$
+
+
+```{r check_linearity}
+augment(lm_log) %>% 
+  ggplot(aes(x = .fitted, y = .resid))+
+  geom_point()+
+  labs(x = "Predicted Suicide Rate per 100k", y = "Residual Value")+
+  geom_hline(yintercept = 0, color = "red", lty = 2)
+
+augment(lm_log) %>% 
+  ggplot(aes(x = .resid))+
+  geom_histogram(bins = 17)+
+  labs(x = "Residual Value", y = "Count")
+
+augment(lm_log) %>% 
+  ggplot(aes(x = 1:7207, y = .resid))+
+  geom_point()+
+  labs(x = "Index", y = "Residual Value")
+```
+
 # Create better Graphic
 
 ```{r}
-ggplot(data = suicide, mapping = aes(x = age, y = suicides_no, 
-                                                fill = age)) +
-  geom_col() +
+suicide %>% 
+  mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
+  ggplot(mapping = aes(x = age, y = suicides_no, 
+                                                fill = sex)) +
+  geom_col(position = "dodge") +
   scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
                             "35-54 years","55-74 years","75+ years")) +
-  scale_fill_manual(values = c("grey 50","grey 50","red", "grey 50",
-                               "grey 50","grey 50"))+
   coord_flip() +
-  facet_wrap(sex ~ .) +
-  theme(legend.position = "none") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
   labs(title = 
-  "Males Age 35-54 are Most at Risk for Suicide and 3.3 times more likely 
+  "Males Age 35-54 Commit Suicide the Most and Males are 3.3 times more likely
 than Females to Commit Suicide at any Age",
-       x = "Age Group", y = "Count") 
+       x = "Age Group", y = "Suicide Count", fill = "Sex") 
 
 ```
 
 
+# References
+
+Coor_flip()
+https://ggplot2.tidyverse.org/reference/coord_flip.html
+
+Converting to date 
+https://stackoverflow.com/questions/30255833/convert-four-digit-year-values-to-a-date-type
 
