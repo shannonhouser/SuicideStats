@@ -409,7 +409,7 @@ ggplot(data = gdp_graph_data, mapping = aes(x = log(gdp_per_capita),
 ```{r sex_and_age}
 suicide %>% 
   mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
-  ggplot(mapping = aes(x = age, y = suicides_100k_pop, 
+  ggplot(mapping = aes(x = age, y = suicides_no, 
                                                 fill = sex)) +
   geom_col(position = "dodge") +
   scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
