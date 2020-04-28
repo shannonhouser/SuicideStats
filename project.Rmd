@@ -420,6 +420,23 @@ suicide %>%
   labs(title = 
   "Males Age 35-54 Commit Suicide the Most and Males are 3.3 times more likely
 than Females to Commit Suicide at any Age",
+       x = "Age Group", y = "Suicide count", fill = "Sex") 
+
+```
+
+```{r sex_and_age}
+suicide %>% 
+  mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
+  ggplot(mapping = aes(x = age, y = suicides_100k_pop, 
+                                                fill = sex)) +
+  geom_col(position = "dodge") +
+  scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
+                            "35-54 years","55-74 years","75+ years")) +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  labs(title = 
+  "Males age 75+ experience the highest rate of suicide",
        x = "Age Group", y = "Suicides per 100k", fill = "Sex") 
 
 ```
