@@ -276,7 +276,8 @@ suicide %>%
 top_10_gdp_capita <- suicide %>%
   group_by(country) %>% 
   summarise(avg_gdp_capita = mean(gdp_per_capita),
-            tot_suicides = sum(suicides_no)) %>% 
+            tot_suicides = sum(suicides_no), 
+            suicide_per_capita = mean(suicides_100k_pop)) %>% 
   arrange(desc(avg_gdp_capita))
 ```
 
@@ -324,7 +325,7 @@ top_hdi <- top_hdi %>%
                                 avg_hdi >= 0.800 & avg_hdi < 1 ~ "very high (0.800-1)"))
 ```
 
-```{r total_age}
+```{r hdi_groups_suicide}
 
 ggplot(data = top_hdi, mapping = aes(x = hdi_groups, y = suicide_per_capita, fill = hdi_groups))+
   geom_col()+
@@ -350,14 +351,42 @@ sucides per 100k in the "high" category and a much lower suicide rate for countr
 developed nations on avaerage suffer from higher rates of suicide, even if their life
 expectancy (a componet of HDI) is greater. 
 
-```{r hdi_groupings}
-top_hdi <- top_hdi %>% 
-  mutate(hdi_groups = case_when(avg_hdi >= 0.350 & avg_hdi < 0.550 ~ "low
-                                (0.350-0.550)", 
-                                avg_hdi >= 0.550 & avg_hdi < 0.700 ~ "medium (0.550-0.700)", 
-                                avg_hdi >= 0.700 & avg_hdi < 0.800 ~ "high (0.700-0.800)", 
-                                avg_hdi >= 0.800 & avg_hdi < 1 ~ "very high (0.800-1)"))
+```{r gdp_groupings}
+ top_10_gdp_capita <- top_10_gdp_capita %>% 
+  mutate(gdp_groups = case_when(avg_gdp_capita < 2000 ~ "<2000", 
+                                avg_gdp_capita >= 2000 & avg_gdp_capita < 5000 
+                                ~ "2,000-5,000", 
+                                avg_gdp_capita >= 5000 & avg_gdp_capita < 10000
+                                ~ "5,000-10,000", 
+                                avg_gdp_capita >= 10000 & avg_gdp_capita < 20000 
+                                ~ "10,000-20,000",
+                                avg_gdp_capita >= 20000 & avg_gdp_capita < 35000 
+                                ~ "20,000-35,000",
+                                avg_gdp_capita >= 35000 & avg_gdp_capita < 50000 
+                                ~ "35,000-50,000",
+                                avg_gdp_capita > 50000 ~ ">50000"))
 ```
+
+```{r gdp_groups_suicide}
+
+ggplot(data = top_10_gdp_capita, mapping = aes(x = gdp_groups, y = suicide_per_capita, fill = gdp_groups))+
+  geom_col()+
+  scale_fill_manual(values = c("grey 50","grey 50","grey 50",
+                               "grey 50", "grey 50", "grey 50", "red" ))+
+  labs(title = 
+         "GDP per Capita presents little influence on suicides per 100k",
+       x = "GDP per Capita", y = "Average Suicide per 100k")
+```
+
+The visualization above divides countries by levels commonly used to analyze GDP per 
+capita. The countries with GDP per capita 5,000-10,000 together experienced the highest 
+number of suicides per 100k of any group. However, the group with the next highest suicide 
+rate was those countries with GDP per capita of 2,000-5,000, followed by those with GDP 
+per capita of 10,000-20,000, indicating a lack of a clear pattern between GDP per capita 
+and suicides per 100k. This visualization possibly provides insight showing that countires 
+with mid-to-low GDP per capita, averaged together, have the highest suicide rate. However, 
+it further indicates that countries grouped by HDI is a more consistant and insighful 
+visualization when compared with suicides per 100k. 
 
 ## Try log Graphs
 
