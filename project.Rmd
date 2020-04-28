@@ -38,6 +38,59 @@ HDI for year, gdp for year, gdp per capita, and generation.
 
 # Data Analysis Plan
 
+# Planning
+
+The response variables we will test are the numbers of suicides and the
+number of suicides per 100k people. The explanatory variables we will 
+examine are different age groups, sex, years, countries, and the 
+socioeconomic status of each country, including their Human Development
+Index (HDI),growth domestic product (GDP), and GDP per capita.
+
+In addition to observing each individual explanatory variable's 
+impact on the response variables, we will examine how the following 
+combination of explanatory variables and the corresponding result 
+on the response variables: 
+
+-Age groups faceted by sex 
+-HDI with age 
+-HDI with sex 
+-HDI with sex and age
+-GDP with age
+-GDP with sex
+-GDP with sex and age
+-the above combinations faceted by time period (years) 
+-the above combinations for Each individual country
+-the above combinations for World regions including continents and
+sub-regions of each continent
+
+
+In our analysis of the dataset we plan to use statistical methods and tools 
+in R including, linear modeling, regression modeling, a combination of
+visualization techniques, and null hypothesis testing. 
+
+In our analysis of the dataset we plan to use statistical methods and tools 
+in R including, linear modeling, regression modeling, a combination of
+visualization techniques, and null hypothesis testing.
+
+From our preliminary analysis, we believe that trying to find predictors of
+suicide using modeling techniques would be a good place to start. We believe 
+that such variables as sex and age may have large impacts on the response
+variables of total suicide numbers and mean suicide rates. We also believe
+that gdp and gdp per capita may not play as large of a role as people may think.
+Instead, perhaps geopolitical factors that are outside of our datasets scope
+play a large part in suicide determinants. 
+
+Furthermore, we plan to explore how these factors have changed over time
+and if the changes are statistically significant. For example, we will explore
+whether the total number of suicides in the US has significantly changed between
+1985 and 2016, and compare these changes with comparable nations within the data.
+
+# Glimpse of Data
+
+```{r glimpse}
+glimpse(suicide)
+```
+
 ## Summary Statistics and Visualizations
 
 ```{r load_packages}
@@ -47,6 +100,11 @@ library(magrittr)
 library(ggmap)
 library(stringr)
 library(maps)
+```
+
+```{r clean_names}
+library(janitor)
+suicide <- janitor::clean_names(suicide)
 ```
 
 
@@ -85,7 +143,7 @@ We decided that this is not really helpful information and went on to explore fu
 ```{r top_ten_rate}
 top_ten_rate <- suicide %>% 
   group_by(country) %>% 
-  summarise(rate_suicide = mean(`suicides/100k pop`))%>% 
+  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
   arrange(desc(rate_suicide)) %>%
   slice(1:10) %>% 
   select(country) %>% 
@@ -93,7 +151,7 @@ top_ten_rate <- suicide %>%
 
 suicide %>% 
   group_by(country) %>% 
-  summarise(rate_suicide = mean(`suicides/100k pop`)) %>% 
+  summarise(rate_suicide = mean(suicides_100k_pop)) %>% 
   arrange(desc(rate_suicide)) %>% 
   slice(1:10)
 ```
@@ -107,7 +165,7 @@ unable to currently predict.
 ```{r top_ten_rate_over_time}
 top_ten_rate_over_time <- suicide %>% 
   group_by(country, year) %>% 
-  summarise(rate_suicide = mean(`suicides/100k pop`)) %>% 
+  summarise(rate_suicide = mean(suicides_100k_pop)) %>% 
   filter(country %in% c(top_ten_rate))
 
 ggplot(data = top_ten_rate_over_time, aes(x = year, rate_suicide, 
@@ -201,23 +259,23 @@ year of this study's data collection, 2016.
 ```{r gdp_top_ten}
 suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp = mean(`gdp_for_year ($)`)) %>% 
+  summarise(avg_gdp = mean(gdp_for_year)) %>% 
   arrange(desc(avg_gdp)) 
 
 top_10_gdp <- suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp = mean(`gdp_for_year ($)`),
+  summarise(avg_gdp = mean(gdp_for_year),
             tot_suicides = sum(suicides_no)) %>% 
   arrange(desc(avg_gdp)) 
 
 suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp_capita = mean(`gdp_per_capita ($)`)) %>% 
+  summarise(avg_gdp_capita = mean(gdp_per_capita)) %>% 
   arrange(desc(avg_gdp_capita)) 
 
 top_10_gdp_capita <- suicide %>%
   group_by(country) %>% 
-  summarise(avg_gdp_capita = mean(`gdp_per_capita ($)`),
+  summarise(avg_gdp_capita = mean(gdp_per_capita),
             tot_suicides = sum(suicides_no)) %>% 
   arrange(desc(avg_gdp_capita))
 ```
@@ -229,6 +287,76 @@ ggplot(data = top_10_gdp_capita, mapping = aes(x = avg_gdp_capita,
   geom_point()+
   labs(title = "Minimal relationship between gdp per capita and suicides", 
        x = "GDP per capita", y = "Number of Suicides")
+```
+
+
+```{r hdi_analysis}
+suicide_hdi <- suicide %>%
+  na.omit(suicide)
+
+suicide_hdi %>% 
+  group_by(country) %>% 
+  summarise(avg_hdi = mean(hdi_for_year)) %>% 
+  arrange(desc(avg_hdi)) 
+
+top_hdi <- suicide_hdi %>%
+  group_by(country) %>% 
+  summarise(avg_hdi = mean(hdi_for_year),
+            suicide_per_capita = mean(suicides_100k_pop)) %>% 
+  arrange(desc(avg_hdi)) 
+```
+
+```{r hdi_vs_suicide_per_100k}
+ggplot(data = top_hdi, mapping = aes(x = avg_hdi,
+                                     y = suicide_per_capita)) +
+  geom_point()+
+  labs(title = "Minimal relationship between human development index and suicides", 
+       x = "Human Development Index", y = "Suicides per 100k")
+```
+
+
+```{r hdi_groupings}
+top_hdi <- top_hdi %>% 
+  mutate(hdi_groups = case_when(avg_hdi >= 0.350 & avg_hdi < 0.550 ~ "low
+                                (0.350-0.550)", 
+                                avg_hdi >= 0.550 & avg_hdi < 0.700 ~ "medium (0.550-0.700)", 
+                                avg_hdi >= 0.700 & avg_hdi < 0.800 ~ "high (0.700-0.800)", 
+                                avg_hdi >= 0.800 & avg_hdi < 1 ~ "very high (0.800-1)"))
+```
+
+```{r total_age}
+
+ggplot(data = top_hdi, mapping = aes(x = hdi_groups, y = suicide_per_capita, fill = hdi_groups))+
+  geom_col()+
+  scale_fill_manual(values = c("grey 50","grey 50","red",
+                               "grey 50", "grey 50"))+
+  labs(title = 
+         "Countries with highest HDI experience higher rate of suicide",
+       x = "HDI", y = "Average Suicide per 100k")
+```
+
+The visualization above examines a relationship between the Human Development Index (HDI) 
+and suicides per 100k. HDI examines a combination of facters regarding development, which
+include life expectancy, education level, and gross national income.  We grouped countries
+into four levels according to their assigned HDI value. The categories were as follows: 
+-low = 0.350 - 0.550
+-medium = 0.550-0.700
+-high = 0.700-0.800
+-very high = 0.800-1
+The visualization reveals that, as a group, countries in the "very high" category experience
+the highest number of suicides per 100k. This is follwed by a comparably high number of
+sucides per 100k in the "high" category and a much lower suicide rate for countries in the
+"medium" category. This is an insighful finding allowing us to understand that the more
+developed nations on avaerage suffer from higher rates of suicide, even if their life
+expectancy (a componet of HDI) is greater. 
+
+```{r hdi_groupings}
+top_hdi <- top_hdi %>% 
+  mutate(hdi_groups = case_when(avg_hdi >= 0.350 & avg_hdi < 0.550 ~ "low
+                                (0.350-0.550)", 
+                                avg_hdi >= 0.550 & avg_hdi < 0.700 ~ "medium (0.550-0.700)", 
+                                avg_hdi >= 0.700 & avg_hdi < 0.800 ~ "high (0.700-0.800)", 
+                                avg_hdi >= 0.800 & avg_hdi < 1 ~ "very high (0.800-1)"))
 ```
 
 ## Try log Graphs
@@ -252,7 +380,7 @@ ggplot(data = gdp_graph_data, mapping = aes(x = log(gdp_per_capita),
 ```{r sex_and_age}
 suicide %>% 
   mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
-  ggplot(mapping = aes(x = age, y = suicides_no, 
+  ggplot(mapping = aes(x = age, y = suicides_100k_pop, 
                                                 fill = sex)) +
   geom_col(position = "dodge") +
   scale_x_discrete(limits=c("5-14 years","15-24 years","25-34 years",
@@ -263,7 +391,7 @@ suicide %>%
   labs(title = 
   "Males Age 35-54 Commit Suicide the Most and Males are 3.3 times more likely
 than Females to Commit Suicide at any Age",
-       x = "Age Group", y = "Suicide Count", fill = "Sex") 
+       x = "Age Group", y = "Suicides per 100k", fill = "Sex") 
 
 ```
 
@@ -272,7 +400,7 @@ than Females to Commit Suicide at any Age",
 ```{r world_map}
 top_ten_rate <- suicide %>% 
   group_by(country) %>% 
-  summarise(rate_suicide = mean(`suicides/100k pop`))%>% 
+  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
   arrange(desc(rate_suicide)) %>%
   mutate(country = if_else(country == "Russian Federation", "Russia",
                            country)) %>% 
@@ -306,66 +434,10 @@ ggplot() +
         )
 ```
 
-# Planning
-
-The response variables we will test are the numbers of suicides and the
-number of suicides per 100k people. The explanatory variables we will 
-examine are different age groups, sex, years, countries, and the 
-socioeconomic status of each country, including their Human Development
-Index (HDI),growth domestic product (GDP), and GDP per capita.
-
-In addition to observing each individual explanatory variable's 
-impact on the response variables, we will examine how the following 
-combination of explanatory variables and the corresponding result 
-on the response variables: 
-
--Age groups faceted by sex 
--HDI with age 
--HDI with sex 
--HDI with sex and age
--GDP with age
--GDP with sex
--GDP with sex and age
--the above combinations faceted by time period (years) 
--the above combinations for Each individual country
--the above combinations for World regions including continents and
-sub-regions of each continent
 
 
-In our analysis of the dataset we plan to use statistical methods and tools 
-in R including, linear modeling, regression modeling, a combination of
-visualization techniques, and null hypothesis testing. 
-
-In our analysis of the dataset we plan to use statistical methods and tools 
-in R including, linear modeling, regression modeling, a combination of
-visualization techniques, and null hypothesis testing.
-
-From our preliminary analysis, we believe that trying to find predictors of
-suicide using modeling techniques would be a good place to start. We believe 
-that such variables as sex and age may have large impacts on the response
-variables of total suicide numbers and mean suicide rates. We also believe
-that gdp and gdp per capita may not play as large of a role as people may think.
-Instead, perhaps geopolitical factors that are outside of our datasets scope
-play a large part in suicide determinants. 
-
-Furthermore, we plan to explore how these factors have changed over time
-and if the changes are statistically significant. For example, we will explore
-whether the total number of suicides in the US has significantly changed between
-1985 and 2016, and compare these changes with comparable nations within the data.
-
-
-# Glimpse of Data
-
-```{r glimpse}
-glimpse(suicide)
-```
 
 ## Try at LM 
-
-```{r clean_names}
-library(janitor)
-suicide <- janitor::clean_names(suicide)
-```
 
 
 ```{r lm}
