@@ -690,6 +690,71 @@ model.
 
 #### Discussion
 
+We chose to work on the global suicide rates dataset to help discuss, and 
+uncover some of the driving factors behind suicides over time, across the 
+world. In light of the tragedies on Duke’s campus over the last few weeks, we 
+felt that it was important to analyze a few of the factors that are most 
+prevalant in the discussion over suicide rates. Our goal was to examine 
+socio-economic, location, and personal factors, including age and gender, 
+to help gain insight into which populations are most susceptible to committing 
+suicide. What we found in our analysis is that the largest number of total 
+suicides in this dataset have been committed by males, and in particular, males
+between the ages of 35-54. This was particularly interesting, as we examine the
+factors that impact suicide, this data showed that males are 3.3 times more 
+likely than females to commit suicide, and the vast majority of these cases 
+are committed by middle aged adults. When we examined the same factors of age 
+and gender on suicide rate, we saw that the elderly (defined as those over 75)
+committed suicide at the highest rates. This reveals much about society and our
+beliefs. We often hear about suicides of middle aged men, which we attribute to
+the stress of growing family, financial, and occupation responsibilities. We 
+hear about these tragedies in the news because they are the most common in 
+number; however, discussion surrounding the suicides of the elderly population 
+is less prevalent. While the total number of suicides committed by the elderly 
+population cannot compare to those of middle aged adults, they are committing 
+the highest proportion of suicides. The mental health struggle of the elderly 
+population is thus being minimized because of their smaller population size. 
+We also found in this dataset that countries with a higher human development 
+index (HDI), a representation of economic and societal growth, experience a 
+higher rate of suicide versus less developed countries. This reveals that some
+of the most advanced and stable countries in the world are more susceptible to 
+suicides from their citizenry. We also were able to create a linear model. The
+linear model uses sex, age, year, HDI, and GDP per capita to account for 
+approximately 64% of the variance in log suicide rates globally. 
+
+While these findings are fascinating to evaluate, it is important to remember 
+that this is just a representative sample of suicide data. Much of the 
+information gathered in this study is taken over a long period of time, with 
+asymmetrical data available from the different countries within this dataset. 
+It is difficult to ensure consistency of reporting of suicides over the 36 year 
+study in every country, which could potentially lead to misleading or even 
+inaccurate information (for some countries) within our study. Furthermore, as
+suicide is a stigmatized topic, many countries may be resistent in reporting 
+transparent and fully accurate information, which also leads to potenial 
+inconistancies within the dataset.
+
+If given the opportunity to begin the project with a fresh perspective, we 
+would have tried to add more data from similar studies in order to increase 
+the number of observations, and decrease the potential variance we find in our
+results. We would have perferred to find more data on some socio-economic 
+relationships with suicide, had we had more explanatory variables to explore 
+in the dataset with greater consistency in our results and in the observations
+we gathered. We would have preferred to add some more political and social 
+factors to use as explanatory variables such as democracy scores, freedom 
+indices, happiness scales, or mental health markers. Additionally, our linear
+model did not satisfy all the linearity assumptions, so moving forward we would
+consider conducting several hypothesis tests to determine if correlation exists
+between the given explanatory variables and the suicide rate and exmine the 
+nature of that correlation. Given the opportunity to continue this study, we 
+would focus specifically on the suicide rates of college-aged students, and 
+their suicide rates based on factors that influence their lives as students. 
+Trying to bring awareness to the topic of suicide was one of our main goals, 
+so had we chosen to continue our analysis, we would have found more 
+relationships and data that was pertinent to the colloge student population 
+in particular. We would have also focused in on the suicide rates in more
+recent years and explored which factors were leading the suicide rates of 
+college students to change during this time period. 
+
+
 # References
 
 Coor_flip()
