@@ -392,17 +392,26 @@ visualization when compared with suicides per 100k.
 
 ```{r gdp_data}
 gdp_graph_data <- suicide_hdi %>% 
-  group_by(country, gdp_per_capita, hdi_for_year) %>% 
+  group_by(country, gdp_per_capita, hdi_for_year, suic) %>% 
   summarise(avg_suicide_rate = mean(suicides_100k_pop))
 ```
 
 
 ```{r gdp_graph_log}
-ggplot(data = gdp_graph_data, mapping = aes(x = log(gdp_per_capita),
-                                     y = log(avg_suicide_rate))) +
+ggplot(data = suicide_hdi, mapping = aes(x = log(gdp_per_capita),
+                                     y = log(suicides_100k_pop))) +
   geom_point()+
   geom_smooth()
 ```
+
+
+```{r hdi_graph_log}
+ggplot(data = suicide_hdi, mapping = aes(x = hdi_for_year,
+                                     y = log(suicides_100k_pop))) +
+  geom_point()+
+  geom_smooth()
+```
+
 
 ## Create better Graphic
 
