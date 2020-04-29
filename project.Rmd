@@ -167,44 +167,7 @@ European countries that may share history, religions, wars, etc. that we are
 unable to currently predict. We also wanted to include a graph of this data to
 focus on the shared geographical component of these results. 
 
-## Map
 
-```{r world_map}
-top_ten_rate <- suicide %>% 
-  group_by(country) %>% 
-  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
-  arrange(desc(rate_suicide)) %>%
-  mutate(country = if_else(country == "Russian Federation", "Russia",
-                           country)) %>% 
-  slice(1:10) 
-
-map_world <- map_data("world")
-
-map_world_joined <- left_join(map_world, top_ten_rate, by = 
-                                c('region' = 'country'))
-
-map_world_joined <- map_world_joined %>% 
-  mutate(fill_flg = ifelse(is.na(rate_suicide),F,T))
-
-ggplot() +
-  geom_polygon(data = map_world_joined, aes(x = long, y = lat, 
-                              group = group, fill = fill_flg)) +
-  scale_fill_manual(values = c("#CCCCCC","#e60000")) +
-  labs(title = 
-  "Countries with Highest Average Suicide Rate are Mostly ex-Soviet Union") +
-  theme(text = element_text(color = "#FFFFFF")
-        ,panel.background = element_rect(fill = "#212121")
-        ,panel.border = element_blank()
-        ,plot.background = element_rect(fill = "#212121")
-        ,panel.grid = element_blank()
-        ,plot.title = element_text(size = 19)
-        ,plot.subtitle = element_text(size = 10)
-        ,axis.text = element_blank()
-        ,axis.title = element_blank()
-        ,axis.ticks = element_blank()
-        ,legend.position = "none"
-        )
-```
 
 
 ```{r top_ten_rate_over_time}
@@ -336,7 +299,6 @@ ggplot(data = top_10_gdp_capita, mapping = aes(x = avg_gdp_capita,
        x = "GDP per capita", y = "Number of Suicides")
 ```
 
-
 ```{r hdi_analysis}
 suicide_hdi <- suicide %>%
   na.omit(suicide)
@@ -361,47 +323,6 @@ ggplot(data = top_hdi, mapping = aes(x = avg_hdi,
          "Minimal relationship between human development index and suicides", 
        x = "Human Development Index", y = "Suicides per 100k")
 ```
-
-
-```{r hdi_groupings}
-top_hdi <- top_hdi %>% 
-  mutate(hdi_groups = case_when(
-                  avg_hdi >= 0.350 & avg_hdi < 0.550 ~ "low(0.350-0.550)", 
-                  avg_hdi >= 0.550 & avg_hdi < 0.700 ~ "medium (0.550-0.700)",
-                  avg_hdi >= 0.700 & avg_hdi < 0.800 ~ "high (0.700-0.800)", 
-                  avg_hdi >= 0.800 & avg_hdi < 1 ~ "very high (0.800-1)"))
-```
-
-```{r hdi_groups_suicide}
-
-ggplot(data = top_hdi, mapping = aes(x = hdi_groups, y = suicide_per_capita, 
-                                     fill = hdi_groups))+
-  geom_col()+
-  scale_x_discrete(limits=c("medium (0.550-0.700)",
-                            "high (0.700-0.800)",
-                            "very high (0.800-1)"))+
-  scale_fill_manual(values = c("grey 50","grey 50","red"))+
-  labs(title = 
-         "Countries with highest HDI experience higher rate of suicide",
-       x = "HDI", y = "Average Suicide per 100k")
-```
-
-The visualization above examines a relationship between the Human Development 
-Index (HDI) and suicides per 100k. HDI examines a combination of facters 
-regarding development, which include life expectancy, education level, and 
-gross national income.  We grouped countries into four levels according to 
-their assigned HDI value. The categories were as follows: 
--low = 0.350 - 0.550
--medium = 0.550-0.700
--high = 0.700-0.800
--very high = 0.800-1
-The visualization reveals that, as a group, countries in the "very high"
-category experience the highest number of suicides per 100k. This is followed 
-by a comparably high number of sucides per 100k in the "high" category and a 
-much lower suicide rate for countries in the "medium" category. This is an 
-insighful finding allowing us to understand that the more developed nations on
-avaerage suffer from higher rates of suicide, even if their life expectancy (a
-componet of HDI) is greater. 
 
 ```{r gdp_groupings}
  top_10_gdp_capita <- top_10_gdp_capita %>% 
@@ -471,8 +392,62 @@ ggplot(data = suicide_hdi, mapping = aes(x = hdi_for_year,
 These graphs also show that there is a slight linear relationship between GDP 
 per capita and HDI and log(suicide rate). This will be helpful in our model. 
 
-## Create better Graphic
 
+#### Methods and Results
+
+## Map
+```{r world_map}
+top_ten_rate <- suicide %>% 
+  group_by(country) %>% 
+  summarise(rate_suicide = mean(suicides_100k_pop))%>% 
+  arrange(desc(rate_suicide)) %>%
+  mutate(country = if_else(country == "Russian Federation", "Russia",
+                           country)) %>% 
+  slice(1:10) 
+
+map_world <- map_data("world")
+
+map_world_joined <- left_join(map_world, top_ten_rate, by = 
+                                c('region' = 'country'))
+
+map_world_joined <- map_world_joined %>% 
+  mutate(fill_flg = ifelse(is.na(rate_suicide),F,T))
+
+ggplot() +
+  geom_polygon(data = map_world_joined, aes(x = long, y = lat, 
+                              group = group, fill = fill_flg)) +
+  scale_fill_manual(values = c("#CCCCCC","#e60000")) +
+  labs(title = 
+  "Countries with Highest Average Suicide Rate are Mostly ex-Soviet Union") +
+  theme(text = element_text(color = "#FFFFFF")
+        ,panel.background = element_rect(fill = "#212121")
+        ,panel.border = element_blank()
+        ,plot.background = element_rect(fill = "#212121")
+        ,panel.grid = element_blank()
+        ,plot.title = element_text(size = 19)
+        ,plot.subtitle = element_text(size = 10)
+        ,axis.text = element_blank()
+        ,axis.title = element_blank()
+        ,axis.ticks = element_blank()
+        ,legend.position = "none"
+        )
+```
+We wanted to examine which factors were most strongly correlated to high 
+suicide rates throughout the world. We also hoped to create a strong linear 
+model with these factors in order to accurately predict suicide rates around 
+the globe. In order to determine what these most strongly correlated factors 
+were, we started with exploratory data analysis. Originally, we looked at 
+countries that had the top number of total suicides in the world, but found 
+that this was strongly correlated to population. We decided to examine suicide
+rate instead, as a better marker. We explored the 10 countries with the 
+highest suicide rates (accounting for differences in population) and were 
+surprised to see that 9 out of 10 of these countries were once part of the 
+ex-Soviet Union. We then mapped this data and decided that there may be 
+geo-political forces that influence suicide rates globally. 
+
+
+
+## Age + Sex Graphs
 ```{r sex_and_age}
 suicide %>% 
   mutate(sex = if_else(sex == "male", "Male", "Female")) %>% 
@@ -508,10 +483,74 @@ suicide %>%
 
 ```
 
-In this graphic, we combined the varibales of age and gender, and examine 
-their relationship with suicide numbers and rates, respectively. 
+We also found that the number of suicides differed greatly among the two 
+biological sexes, with men committing suicide 3.3 times more than their female
+counterparts. We also explored how the number of total suicides  differed 
+among different age groups. We found that the highest total suicides were of 
+those aged 35-54. We postulated that this was due to the “mid-life crisis” 
+that many face as they deal with growing family and occupational 
+responsibilities. We then determined that these two categorical variables 
+would be very important and key components of our future linear model. We 
+wanted to examine the relationship between these variables and suicide rate. 
+When we did this, we saw that those older than 75 had the highest suicide 
+rates for both genders. This revealed the sad truth that while middle aged 
+adults commit the most suicides in number, the elderly population commits the 
+highest proportion of suicides. 
 
-## Try at LM 
+## HDI
+
+```{r hdi_groupings}
+top_hdi <- top_hdi %>% 
+  mutate(hdi_groups = case_when(
+                  avg_hdi >= 0.350 & avg_hdi < 0.550 ~ "low(0.350-0.550)", 
+                  avg_hdi >= 0.550 & avg_hdi < 0.700 ~ "medium (0.550-0.700)",
+                  avg_hdi >= 0.700 & avg_hdi < 0.800 ~ "high (0.700-0.800)", 
+                  avg_hdi >= 0.800 & avg_hdi < 1 ~ "very high (0.800-1)"))
+```
+
+```{r hdi_groups_suicide}
+
+ggplot(data = top_hdi, mapping = aes(x = hdi_groups, y = suicide_per_capita, 
+                                     fill = hdi_groups))+
+  geom_col()+
+  scale_x_discrete(limits=c("medium (0.550-0.700)",
+                            "high (0.700-0.800)",
+                            "very high (0.800-1)"))+
+  scale_fill_manual(values = c("grey 50","grey 50","red"))+
+  labs(title = 
+         "Countries with highest HDI experience higher rate of suicide",
+       x = "HDI", y = "Average Suicide per 100k")
+```
+
+The next thing that we decided to test was the effect of HDI on global suicide
+rates. What we found was that the more developed a country was, the higher 
+that country’s rate of suicides were. What this means is that more 
+economically and socially advanced countries experience higher rates of these 
+tragedies, while their less developed counterparts experience lower rates of 
+suicides globally. This is fascinating in the study of socio-economic factors 
+on suicide ratees, as it shows that a more developed country does not 
+alleviate suicides, and conversely helps their proliferation in these 
+countries. 
+
+The visualization above examines a relationship between the Human Development 
+Index (HDI) and suicides per 100k. HDI examines a combination of facters 
+regarding development, which include life expectancy, education level, and 
+gross national income.  We grouped countries into four levels according to 
+their assigned HDI value. The categories were as follows: 
+-low = 0.350 - 0.550
+-medium = 0.550-0.700
+-high = 0.700-0.800
+-very high = 0.800-1
+The visualization reveals that, as a group, countries in the "very high"
+category experience the highest number of suicides per 100k. This is followed 
+by a comparably high number of sucides per 100k in the "high" category and a 
+much lower suicide rate for countries in the "medium" category. This is an 
+insighful finding allowing us to understand that the more developed nations on
+avaerage suffer from higher rates of suicide, even if their life expectancy (a
+componet of HDI) is greater. 
+
+
+## Linear Model
 
 ```{r lm}
 library(broom)
@@ -587,6 +626,30 @@ based on females age 15-24, however, we can use the coefficients given to
 change the model to predict the suicide rate of indivisuals with very 
 different characteristics. 
 
+We also wanted numeric variables in our model. While  did not see a strong 
+relationship between GDP per capita and suicide rate, we still decided to 
+include it in our inital linear model. GDP and HDI are our source of 
+socio-economic datapoints within this study, so we felt it was important to 
+consider their conclusion in the discussion of global suicide rates over time.
+We did see that countries with the highest GDPs per capita and HDIs also had 
+the highest suicide rates. We also included year because it is an important 
+explanatory variable in our dataset, which ranges from 1985-2015. We know that
+this time series data breaks the rule of independence when creating a linear 
+model. We then created a linear model in order to predict suicide rate based 
+on these 5 variables. We saw that the residuals were skewed to the right and 
+decided to create a new linear model to predict the log of the suicide rate. 
+In order to do this, we filtered out portions of our dataset where the 
+observed suicide rate was 0. This made our model much more accurate in 
+predicted suicide rates over 0; however, it must be stated that our model 
+would not be very good at predicting when it came to countries who have 
+suicide rates of 0, and using it to do so would be an extrapolation of the 
+model. This log model gave us an R^2 of .6396. This means that are model 
+accounts for approximately 64% of the variation in the log suicide rates of 
+different countries.
+
+
+## Linearity Test
+
 ```{r check_linearity_2}
 augment(lm_log) %>% 
   ggplot(aes(x = .fitted, y = .resid)) +
@@ -612,72 +675,6 @@ completely independent of one another; however, this was not unexpected as the
 data is time series and therefore the suicide rates are not completely 
 independent. 
 
-
-# Methods and Results
-
-Map:
-We wanted to examine which factors were most strongly correlated to high 
-suicide rates throughout the world. We also hoped to create a strong linear 
-model with these factors in order to accurately predict suicide rates around 
-the globe. In order to determine what these most strongly correlated factors 
-were, we started with exploratory data analysis. Originally, we looked at 
-countries that had the top number of total suicides in the world, but found 
-that this was strongly correlated to population. We decided to examine suicide
-rate instead, as a better marker. We explored the 10 countries with the 
-highest suicide rates (accounting for differences in population) and were 
-surprised to see that 9 out of 10 of these countries were once part of the 
-ex-Soviet Union. We then mapped this data and decided that there may be 
-geo-political forces that influence suicide rates globally. 
-
-Age + Sex Graphs
-We also found that the number of suicides differed greatly among the two 
-biological sexes, with men committing suicide 3.3 times more than their female
-counterparts. We also explored how the number of total suicides  differed 
-among different age groups. We found that the highest total suicides were of 
-those aged 35-54. We postulated that this was due to the “mid-life crisis” 
-that many face as they deal with growing family and occupational 
-responsibilities. We then determined that these two categorical variables 
-would be very important and key components of our future linear model. We 
-wanted to examine the relationship between these variables and suicide rate. 
-When we did this, we saw that those older than 75 had the highest suicide 
-rates for both genders. This revealed the sad truth that while middle aged 
-adults commit the most suicides in number, the elderly population commits the 
-highest proportion of suicides. 
-
-HDI
-The next thing that we decided to test was the effect of HDI on global suicide
-rates. What we found was that the more developed a country was, the higher 
-that country’s rate of suicides were. What this means is that more 
-economically and socially advanced countries experience higher rates of these 
-tragedies, while their less developed counterparts experience lower rates of 
-suicides globally. This is fascinating in the study of socio-economic factors 
-on suicide ratees, as it shows that a more developed country does not 
-alleviate suicides, and conversely helps their proliferation in these 
-countries. 
-
-Linear Model
-We also wanted numeric variables in our model. While  did not see a strong 
-relationship between GDP per capita and suicide rate, we still decided to 
-include it in our inital linear model. GDP and HDI are our source of 
-socio-economic datapoints within this study, so we felt it was important to 
-consider their conclusion in the discussion of global suicide rates over time.
-We did see that countries with the highest GDPs per capita and HDIs also had 
-the highest suicide rates. We also included year because it is an important 
-explanatory variable in our dataset, which ranges from 1985-2015. We know that
-this time series data breaks the rule of independence when creating a linear 
-model. We then created a linear model in order to predict suicide rate based 
-on these 5 variables. We saw that the residuals were skewed to the right and 
-decided to create a new linear model to predict the log of the suicide rate. 
-In order to do this, we filtered out portions of our dataset where the 
-observed suicide rate was 0. This made our model much more accurate in 
-predicted suicide rates over 0; however, it must be stated that our model 
-would not be very good at predicting when it came to countries who have 
-suicide rates of 0, and using it to do so would be an extrapolation of the 
-model. This log model gave us an R^2 of .6396. This means that are model 
-accounts for approximately 64% of the variation in the log suicide rates of 
-different countries.
-
-Linearity Test
 Furthermore, while the model still does not perfectly pass the linearity 
 requirements needed to use this model, it looks much better as a log 
 transformation than the original. The residuals have a pretty stable variance 
@@ -691,6 +688,7 @@ however, they are only minorly broken, and do not completely discredit the
 model. 
 
 
+#### Discussion
 
 # References
 
